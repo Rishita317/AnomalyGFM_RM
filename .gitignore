@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.env
+env/
+venv/
+*.egg-info
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtualenv
+.env/
+.venv/
+
+# PyTorch / data
+*.pth
+# Consider using LFS for these; don't ignore until LFS is set up

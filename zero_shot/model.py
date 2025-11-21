@@ -1,7 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch_sparse
+try:
+    import torch_sparse
+except Exception as e:
+    torch_sparse = None
+    print("warning: torch_sparse import failed — sparse ops may be disabled:", e)
 
 
 class GCN(nn.Module):

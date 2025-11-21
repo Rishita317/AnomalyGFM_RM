@@ -6,7 +6,11 @@ from utils import *
 
 from sklearn.metrics import roc_auc_score
 import random
-import dgl
+try:
+    import dgl
+except Exception as _e:
+    dgl = None
+    print("warning: dgl import failed — graph operations may be disabled:", _e)
 from sklearn.metrics import average_precision_score
 import argparse
 from tqdm import tqdm

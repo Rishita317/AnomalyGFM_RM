@@ -1,89 +1,162 @@
-<div align="center">
-  <h2><b> AnomalyGFM: Graph Foundation Model for Zero/Few-shot Anomaly Detection </b></h2>
-</div>
+# AnomalyGFM — Graph Foundation Model for Zero/Few-shot Anomaly Detection
 
-<div align="center">
+Short: AnomalyGFM finds abnormal nodes in graphs (social, transaction, e‑commerce, etc.). This README gives explicit, reproducible setup and run steps for macOS (Intel & Apple Silicon) and Linux.
 
-![](https://img.shields.io/github/last-commit/mala-lab/AnomalyGFM?color=green)
-![](https://img.shields.io/github/stars/mala-lab/AnomalyGFM?color=yellow)
-![](https://img.shields.io/github/forks/mala-lab/AnomalyGFM?color=lightblue)
-![](https://img.shields.io/badge/PRs-Welcome-green)
-[**📜 Datasets**](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing) [**📝 arxiv**](https://arxiv.org/abs/2502.09254)
-</div>
+## Quick start (recommended, reproducible)
 
+1. Clone repo and open project root:
+   cd ~/Downloads/AnomalyGFM
 
-## Promotional Video
+2. Create a conda environment with Python 3.9 (recommended):
+   conda create -n anomalygfm python=3.9 -y
+   conda activate anomalygfm
 
-📢 We are excited to share that our paper presentation video is now available on YouTube!
+3. Install lightweight Python deps:
+   Create `requirements_fixed.txt` with:
 
-🎬 Watch it here: [[YouTube Link](https://youtu.be/OrY9epUwh0M?si=izAi9xjQuNLQmaMX)]
+   ```
+   matplotlib>=3.5.0
+   networkx>=2.6.3
+   numpy>=1.21.6
+   pandas>=1.3.5
+   scikit-learn>=1.0.2
+   scipy>=1.7.3
+   tqdm
+   ```
 
-📌 Your feedback and support are greatly appreciated!
+   Then:
+   pip install -r requirements_fixed.txt
 
+4. Install PyTorch (use official instructions for your platform):
 
-## Main Contributions
+   - CPU / Apple Silicon (conda):
+     conda install pytorch torchvision torchaudio -c pytorch -y
+   - GPU (Linux) — follow https://pytorch.org
 
+5. Install DGL and graph libraries:
 
-> 1️⃣ AnomalyGFM is the **first** GAD-oriented GFM with strong zero-shot and few-shot generalization abilities. 
+   - Try CPU wheel (works for many macOS setups):
+     pip uninstall -y dgl
+     pip install dgl -f https://data.dgl.ai/wheels/cpu/repo.html
+   - If using PyG/torch-sparse/torch-geometric (required by some modules):
+     conda install -c pyg -c conda-forge torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -y
+   - If issues occur on macOS/arm64 see Troubleshooting section.
 
-> 2️⃣ AnomalyGFM is pre-trained to learn discriminative, graph-agnostic class prototypes with normal and abnormal residual features, and it supports few-shot graph prompt tuning for better adaptation.
+6. Place pretrained weights:
+   mkdir -p pretrain
+   cp few_shot/model_weights_abnormal300.pth pretrain/
 
-> 3️⃣ A comprehensive benchmark on both zero-shot and few-shot settings using 11 real-world GAD datasets is established, on which i) AnomalyGFM performs significantly
-better the state-of-the-art unsupervised, supervised, and generalist GAD methods, and ii) AnomalyGFM can scale up to very large graphs
+## Datasets
 
+- Download the aligned GAD datasets from:
+  https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing
+- After unzip, place `.mat` files in repository root or `datasets/` (scripts check repo root by default).
+  Example:
+  mv ~/Downloads/gad_extracted/\*.mat ~/Downloads/AnomalyGFM/
 
-![Framework of AnomalyGFM](framework.png)
+Verify:
+ls -la \*.mat
+ls -la datasets/
 
+## Where the run scripts live (use these exact commands)
 
+Files are in subfolders — run from project root:
 
-The GAD datasets after feature alignment can be obtained from   [google drive link](https://drive.google.com/drive/folders/1SSWgFRdth3U44_IMRnW775B1l-bjQATW?usp=sharing). 
+- Zero-shot inference
+  python zero_shot/run_abnormal.py --dataset_train Facebook_svd --dataset_test yelp_svd
 
+- Few-shot normal fine-tuning
+  python few_shot/run_finetune_normal.py --dataset_train Facebook_svd --dataset_test elliptic_svd
 
-## Requirements
+- Few-shot abnormal fine-tuning
+  python few_shot/run_finetune_abnormal.py --dataset_train Facebook_svd --dataset_test elliptic_svd
 
-To install requirements:
+- Large-scale inference
+  python large_scale/run_inference.py --dataset_test <dataset_name>
 
-```setup
-pip install -r requirements.txt
+Or run from folder:
+cd zero_shot && python run_abnormal.py --dataset_train Facebook_svd --dataset_test yelp_svd
+
+## Minimal smoke-test (quick health check)
+
+Create `scripts/smoke_test.py` with:
+
+```python
+import sys, os
+import torch
+ok = {"python": sys.version.split()[0], "torch": torch.__version__}
+try:
+    import dgl; ok["dgl"] = dgl.__version__
+except Exception as e:
+    ok["dgl_error"] = str(e)
+print(ok)
+print("Datasets present:", any(f.endswith(".mat") for f in os.listdir(".")))
 ```
 
-## Training and Zero-shot Inference  
+Run:
+python scripts/smoke_test.py
 
-To run the model(s), run this command:
-```
-python run_abnormal.py 
-```
+## Typical problems & fixes (macOS / Apple Silicon)
 
-## Training and Few-shot Inference  
+1. DGL graphbolt / C++ library errors
 
-Run this command:
-```
-python run_finetune_normal.py 
-```
-For few-shot labeled normal nodes fine-tuning.
+   - Install CPU wheel: pip install dgl -f https://data.dgl.ai/wheels/cpu/repo.html
+   - If graphbolt still errors, run guarded imports (see below) or use Linux/x86 environment (Docker / remote machine).
 
-Run this command:
-```
-python run_finetune_abnormal.py 
-```
-for few-shot labeled abnormal nodes fine-tuning.
+2. torch_sparse / torch_geometric missing or binary mismatch
 
-## Large-scale Graph Generalization 
+   - Use conda binary builds:
+     conda install -c pyg -c conda-forge pytorch-sparse torch-geometric -y
+   - Or install PyG wheels matching your torch version:
+     TORCH_VER=$(python - <<'PY'
+     import torch, re
+     print(re.sub(r'\+.*','',torch.__version__))
+     PY
+     )
+     pip install -f https://data.pyg.org/whl/torch-${TORCH_VER}.html torch-sparse torch-scatter torch-geometric
 
-Run this command:
+3. Missing pydantic / torchdata errors
+
+   - conda install -c conda-forge pydantic
+   - pip install "torchdata>=0.11.0"
+
+4. If a compiled package fails due to ABI mismatch, prefer recreating the conda env with the exact Python version used by builders (3.9 recommended).
+
+## Recommended repository improvements (short)
+
+- Add `environment.yml` and `requirements_fixed.txt`
+- Add `scripts/smoke_test.py` and `scripts/download_datasets.sh` (small dataset placer)
+- Guard optional imports (dgl, torch_sparse, torch_geometric) to print friendly messages
+- Provide a small toy dataset for onboarding
+
+## Troubleshooting quick commands
+
+- Check your working dir and python:
+  pwd
+  which python
+  python -V
+
+- Verify imports:
+  python - <<'PY'
+  import torch, sys
+  print("python", sys.version)
+  try:
+  import dgl; print("dgl", dgl.**version**)
+  except Exception as e:
+  print("dgl error", e)
+  PY
+
+## How to run experiments reproducibly
+
+- Use the conda env above
+- Put datasets into repo root
+- Copy pretrained weights into `pretrain/`
+- Run scripts using the subpath commands above
+
+## Contact / citation
+
+If this repo is useful please cite:
+
 ```
-python run_inference.py 
-```
-
-## Citation
-If you find this repo useful, please cite our paper.
-
-```bibtex
-@inproceedings{qiao2025anomalygfm,
-  title={AnomalyGFM: Graph foundation model for zero/few-shot anomaly detection},
-  author={Qiao, Hezhe and Niu, Chaoxi and Chen, Ling and Pang, Guansong},
-  booktitle={Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V. 2},
-  pages={2326--2337},
-  year={2025}
-}
+@inproceedings{qiao2025anomalygfm, ... }
 ```

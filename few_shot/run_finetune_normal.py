@@ -1,5 +1,20 @@
 import torch
-import torch.nn as nn
+try:
+    import dgl
+except Exception as _e:
+    dgl = None
+    print("warning: dgl import failed — graph operations may be disabled:", _e)
+import numpy as np
+from sklearn.metrics import roc_auc_score
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+import scipy.io as scio
+import os
+
+print("✅ All imports successful!")
+print(f"PyTorch version: {torch.__version__}")
+print(f"DGL version: {dgl.__version__}")
+print(f"CUDA available: {torch.cuda.is_available()}")
 
 from model import Model_fine_tuning
 
@@ -7,13 +22,10 @@ from utils import *
 
 from sklearn.metrics import roc_auc_score
 import random
-import dgl
 from sklearn.metrics import average_precision_score
 import argparse
-from tqdm import tqdm
 import time
 import torch.nn.functional as F
-import scipy.io as scio
 
 # os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 # os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, [3]))
@@ -227,6 +239,43 @@ with tqdm(total=args.num_epoch) as pbar:
                 print('Testing {} AUC_measure:{:.4f}'.format(args.dataset_test, auc_measure))
                 print('Testing AP_measure:', AP_measure)
                 print("<<<<<<<<<<<<<<<<<<<<<< Test end >>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+required_files = [
+    'model.py',
+    'utils.py', 
+    'pretrain/model_weights_abnormal300.pth',
+]
+
+required_dirs = [
+    'pretrain/',
+    'data/' # likely where datasets are stored
+]
+
+print("Checking required files:")
+for file in required_files:
+    exists = os.path.exists(file)
+    print(f"  {file}: {'✅ Found' if exists else '❌ Missing'}")
+
+print("\nChecking required directories:")
+for dir in required_dirs:
+    exists = os.path.exists(dir)
+    print(f"  {dir}: {'✅ Found' if exists else '❌ Missing'}")
+
+print("\nAll files in current directory:")
+for item in os.listdir('.'):
+    print(f"  {item}")
+
+import torch
+import dgl
+import numpy as np
+
+print("✅ DGL imported successfully!")
+print(f"DGL version: {dgl.__version__}")
+print(f"PyTorch version: {torch.__version__}")
+
+# Test creating a simple graph
+g = dgl.graph(([0, 1, 2], [1, 2, 0]))
+print("✅ DGL graph creation works!")
 
 
 

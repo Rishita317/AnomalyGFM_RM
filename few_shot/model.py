@@ -1,4 +1,16 @@
 import torch
+import dgl
+import numpy as np
+
+print("✅ DGL imported successfully!")
+print(f"DGL version: {dgl.__version__}")
+print(f"PyTorch version: {torch.__version__}")
+
+# Test creating a simple graph
+g = dgl.graph(([0, 1, 2], [1, 2, 0]))
+print("✅ DGL graph creation works!")
+
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch_sparse
