@@ -9,7 +9,7 @@ import random
 try:
     import dgl
 except Exception as _e:
-    dgl = None
+    dgl = None  # type: ignore[assignment]
     print("warning: dgl import failed — graph operations may be disabled:", _e)
 from sklearn.metrics import average_precision_score
 import argparse

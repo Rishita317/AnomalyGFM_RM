@@ -241,9 +241,9 @@ def draw_pdf(message_normal, message_abnormal, message_real_abnormal, dataset: s
     plt.rcParams['figure.figsize'] = (8.5, 7.5)
 
     n, bins, patches = plt.hist(message_all, bins=30, density=True, label=['Normal', 'Outlier', 'Abnormal'])
-    y_0 = mlab.normpdf(bins, mu_0, sigma_0)
-    y_1 = mlab.normpdf(bins, mu_1, sigma_1)
-    y_2 = mlab.normpdf(bins, mu_2, sigma_2)
+    y_0 = mlab.normpdf(bins, mu_0, sigma_0)  # type: ignore[attr-defined]
+    y_1 = mlab.normpdf(bins, mu_1, sigma_1)  # type: ignore[attr-defined]
+    y_2 = mlab.normpdf(bins, mu_2, sigma_2)  # type: ignore[attr-defined]
 
     plt.plot(bins, y_0, color='steelblue', linestyle='--', linewidth=2.5)
     plt.plot(bins, y_1, color='darkorange', linestyle='--', linewidth=2.5)
@@ -273,9 +273,9 @@ def draw_pdf_methods(method: str, message_normal, message_abnormal, message_real
     plt.rcParams['figure.figsize'] = (8.5, 7.5)
 
     n, bins, patches = plt.hist(message_all, bins=30, density=True, label=['Normal', 'Outlier', 'Abnormal'])
-    y_0 = mlab.normpdf(bins, mu_0, sigma_0)
-    y_1 = mlab.normpdf(bins, mu_1, sigma_1)
-    y_2 = mlab.normpdf(bins, mu_2, sigma_2)
+    y_0 = mlab.normpdf(bins, mu_0, sigma_0)  # type: ignore[attr-defined]
+    y_1 = mlab.normpdf(bins, mu_1, sigma_1)  # type: ignore[attr-defined]
+    y_2 = mlab.normpdf(bins, mu_2, sigma_2)  # type: ignore[attr-defined]
 
     plt.plot(bins, y_0, color='steelblue', linestyle='--', linewidth=2.5)
     plt.plot(bins, y_1, color='darkorange', linestyle='--', linewidth=2.5)

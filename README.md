@@ -54,21 +54,21 @@ Short: AnomalyGFM finds abnormal nodes in graphs (social, transaction, e‑comme
   Example:
   mv ~/Downloads/gad_extracted/\*.mat ~/Downloads/AnomalyGFM/
 
-Note for this fork (AnomalyGFM_RM)
----------------------------------
+## Note for this fork (AnomalyGFM_RM)
+
 This fork intentionally excludes large dataset and model files to keep the repository lightweight and easy to clone. To run experiments locally you must download the datasets and pretrained weights and place them into the project. Follow these steps:
 
 1. Download the dataset `.mat` files from the link above and put them in either the repository root or `datasets/`.
 
 2. If you need pretrained weights, create `pretrain/` and place the `.pth` file(s) there, for example:
 
-  mkdir -p pretrain
-  cp /path/to/model_weights_abnormal300.pth pretrain/
+mkdir -p pretrain
+cp /path/to/model_weights_abnormal300.pth pretrain/
 
 3. Verify files are present before running scripts:
 
-  ls -la *.mat datasets/*.mat || true
-  ls -la pretrain || true
+ls -la _.mat datasets/_.mat || true
+ls -la pretrain || true
 
 If you prefer not to keep datasets in the repo, you can keep them in a separate folder and update the scripts to point to that path. For reproducibility, note the Drive folder above where the original datasets are hosted.
 

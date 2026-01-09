@@ -18,4 +18,14 @@ venv/
 
 # PyTorch / data
 *.pth
-# Consider using LFS for these; don't ignore until LFS is set up
+*.mat
+pretrain/
+datasets/
+
+# Large model checkpoints
+*.ckpt
+*.pt
+
+# IDE
+.vscode/
+.idea/

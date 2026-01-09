@@ -2,7 +2,7 @@ import torch
 try:
     import dgl
 except Exception as _e:
-    dgl = None
+    dgl = None  # type: ignore[assignment]
     print("warning: dgl import failed — graph operations may be disabled:", _e)
 import numpy as np
 from sklearn.metrics import roc_auc_score
@@ -10,11 +10,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import scipy.io as scio
 import os
-
-print("✅ All imports successful!")
-print(f"PyTorch version: {torch.__version__}")
-print(f"DGL version: {dgl.__version__}")
-print(f"CUDA available: {torch.cuda.is_available()}")
 
 from model import Model_fine_tuning
 
